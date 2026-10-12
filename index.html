@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Happy Birthday Pritha | Only the Moon Knows</title>
+  
+  <!-- Tailwind CSS & Confetti -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Great+Vibes&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Sacramento&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: linear-gradient(135deg, #e0f2fe 0%, #fef3c7 50%, #fbcfe8 100%);
+      color: #1e293b;
+      min-height: 100vh;
+      overflow-x: hidden;
+      margin: 0;
+      padding: 0;
+    }
+
+    .font-handwriting { font-family: 'Great Vibes', cursive; }
+    .font-subscript { font-family: 'Dancing Script', cursive; }
+    .font-romantic { font-family: 'Sacramento', cursive; }
+
+    .glass-panel-light {
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.95);
+      box-shadow: 0 20px 40px rgba(251, 191, 36, 0.12), 0 10px 25px rgba(0, 0, 0, 0.05);
+    }
+
+    .glass-card-sm {
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+    }
+
+    .text-glow {
+      text-shadow: 0 2px 12px rgba(245, 158, 11, 0.35);
+    }
+
+    /* Candle Flame Animation */
+    .candle-flame {
+      animation: flicker 1.2s infinite alternate ease-in-out;
+      transform-origin: center bottom;
+    }
+
+    @keyframes flicker {
+      0% { transform: scale(1) rotate(-2deg); opacity: 0.95; filter: drop-shadow(0 0 8px #f59e0b); }
+      50% { transform: scale(1.15) rotate(2deg); opacity: 1; filter: drop-shadow(0 0 14px #fbbf24); }
+      100% { transform: scale(0.9) rotate(-1deg); opacity: 0.85; filter: drop-shadow(0 0 6px #d97706); }
+    }
+
+    .candle-extinguished {
+      opacity: 0.25 !important;
+      animation: none !important;
+      filter: grayscale(1) !important;
+      transform: scale(0.8) !important;
+      transition: all 0.5s ease;
+    }
+
+    /* Slide Animations */
+    .slide-step {
+      display: none;
+      opacity: 0;
+      transform: translateY(12px) scale(0.98);
+      transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .slide-step.active {
+      display: block;
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  </style>
+</head>
+
+<body class="relative min-h-screen flex flex-col justify-between select-none">
+
+  <!-- Canvas Animation (Shiuli Petals & Sky Lanterns) -->
+  <canvas id="bgCanvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
+
+  <!-- Sound Track Background Audio -->
+  <audio id="bgAudio" loop preload="auto">
+    <source src="https://files.catbox.moe/zzymjl.mp4" type="audio/mp4">
+  </audio>
+
+  <!-- Start Overlay -->
+  <div id="startOverlay" class="fixed inset-0 z-50 flex items-center justify-center bg-sky-900/40 backdrop-blur-md p-4 transition-opacity duration-500">
+    <div class="glass-panel-light max-w-md w-full rounded-3xl p-8 text-center shadow-2xl">
+      <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl animate-bounce">
+        🌼
+      </div>
+      <h2 class="text-3xl font-handwriting font-bold text-amber-800 mb-2">Welcome Pritha</h2>
+      <p class="text-slate-600 text-sm mb-6 leading-relaxed">
+        A special autumn celebration is waiting for you under the moonlit sky.
+      </p>
+      <button onclick="startCelebration()" class="w-full py-3.5 px-6 rounded-full bg-gradient-to-r from-amber-500 to-rose-500 hover:from-amber-600 hover:to-rose-600 text-white font-semibold shadow-lg shadow-amber-500/30 transform hover:-translate-y-0.5 transition-all active:translate-y-0">
+        Enter Celebration 🌸
+      </button>
+    </div>
+  </div>
+
+  <!-- Header Section -->
+  <header class="relative z-10 max-w-4xl mx-auto px-6 pt-6 w-full flex items-center justify-between">
+    <div class="flex items-center space-x-2.5">
+      <span class="text-2xl">🌼</span>
+      <h1 class="text-xl font-bold bg-gradient-to-r from-amber-700 via-rose-600 to-pink-600 bg-clip-text text-transparent">
+        Only the Moon Knows
+      </h1>
+    </div>
+
+    <!-- Slide Indicators -->
+    <div class="flex items-center gap-1.5 bg-white/50 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/60">
+      <span id="dot-0" class="w-2.5 h-2.5 rounded-full bg-amber-500 transition-all"></span>
+      <span id="dot-1" class="w-2 h-2 rounded-full bg-slate-300 transition-all"></span>
+      <span id="dot-2" class="w-2 h-2 rounded-full bg-slate-300 transition-all"></span>
+      <span id="dot-3" class="w-2 h-2 rounded-full bg-slate-300 transition-all"></span>
+    </div>
+  </header>
+
+  <!-- Main Slide View Area -->
+  <main class="relative z-10 max-w-2xl mx-auto px-4 py-6 w-full my-auto">
+    <div class="glass-panel-light rounded-3xl p-6 md:p-8 relative min-h-[520px] flex flex-col justify-between shadow-2xl">
+
+      <!-- SLIDE 1: Birthday Card & Warm Wishes -->
+      <section id="slide-0" class="slide-step active space-y-5 text-center">
+        <div class="relative max-w-sm mx-auto group">
+          <div class="absolute -inset-1 bg-gradient-to-r from-amber-400 to-pink-500 rounded-2xl blur opacity-30 group-hover:opacity-50 transition duration-500"></div>
+          <div class="relative rounded-2xl overflow-hidden border-2 border-white/90 shadow-md">
+            <img src="https://files.catbox.moe/72ftvs.jpg" alt="Pritha Birthday Card" class="w-full h-auto object-cover max-h-[320px] transform hover:scale-102 transition duration-500">
+          </div>
+        </div>
+
+        <div>
+          <h2 class="text-4xl md:text-5xl font-handwriting text-amber-800 text-glow mb-2">Happy Birthday Pritha!</h2>
+          <p class="text-slate-700 text-sm md:text-base leading-relaxed font-light max-w-lg mx-auto">
+            May this special day bring you endless happiness, radiant smiles, and sweet memories that stay in your heart forever.
+          </p>
+        </div>
+      </section>
+
+      <!-- SLIDE 2: Interactive Cake & Candle Blowing -->
+      <section id="slide-1" class="slide-step space-y-6 text-center">
+        <div class="py-2">
+          <h2 class="text-3xl font-bold text-amber-900 mb-1">Make a Special Wish</h2>
+          <p class="text-xs text-slate-600">Blow out the candles to release your birthday wishes into the sky!</p>
+        </div>
+
+        <!-- Interactive Cake Illustration -->
+        <div class="relative inline-block my-4 py-6 px-10 bg-white/70 rounded-3xl border border-amber-200 shadow-inner">
+          <div class="flex justify-center items-end gap-6 mb-1">
+            <div class="flex flex-col items-center">
+              <span id="flame-1" class="candle-flame text-2xl cursor-pointer" onclick="blowIndividualCandle(1)">🕯️</span>
+            </div>
+            <div class="flex flex-col items-center -mt-2">
+              <span id="flame-2" class="candle-flame text-3xl cursor-pointer" onclick="blowIndividualCandle(2)">🕯️</span>
+            </div>
+            <div class="flex flex-col items-center">
+              <span id="flame-3" class="candle-flame text-2xl cursor-pointer" onclick="blowIndividualCandle(3)">🕯️</span>
+            </div>
+          </div>
+
+          <div class="text-6xl md:text-7xl transform hover:scale-105 transition-transform duration-300 cursor-pointer" onclick="blowAllCandles()">
+            🎂
+          </div>
+        </div>
+
+        <!-- Microphone & Touch Actions -->
+        <div class="space-y-3 max-w-sm mx-auto">
+          <button id="micBtn" onclick="toggleMicBlowing()" class="w-full py-3 px-5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-300 text-amber-900 font-medium text-xs md:text-sm flex items-center justify-center gap-2 transition-all">
+            <span id="micIcon" class="text-base">🎤</span>
+            <span id="micStatusText">Blow into your microphone to extinguish</span>
+          </button>
+
+          <p id="candleFeedback" class="text-xs font-semibold text-rose-600 min-h-[18px]">
+            Tap candle flames or use your mic!
+          </p>
+        </div>
+      </section>
+
+      <!-- SLIDE 3: Memory Constellation Stars -->
+      <section id="slide-2" class="slide-step space-y-5 text-center">
+        <div>
+          <h2 class="text-3xl font-bold text-amber-900 mb-1">Starry Night Memories</h2>
+          <p class="text-xs text-slate-600">Tap each glowing star to reveal a hidden secret note.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5 pt-2">
+          <div onclick="openNote('bright')" class="glass-card-sm p-4 rounded-2xl hover:bg-white/90 border border-amber-200 transition-all cursor-pointer hover:-translate-y-1 shadow-sm text-center">
+            <div class="text-3xl mb-1">✨</div>
+            <h3 class="font-bold text-amber-900 text-sm">A Bright Smile</h3>
+            <p class="text-[11px] text-slate-500 mt-1">Bringing gentle warmth to every moment...</p>
+          </div>
+
+          <div onclick="openNote('moon')" class="glass-card-sm p-4 rounded-2xl hover:bg-white/90 border border-amber-200 transition-all cursor-pointer hover:-translate-y-1 shadow-sm text-center">
+            <div class="text-3xl mb-1">🌙</div>
+            <h3 class="font-bold text-amber-900 text-sm">Moonlit Wishes</h3>
+            <p class="text-[11px] text-slate-500 mt-1">Silent prayers whispered under the October sky...</p>
+          </div>
+
+          <div onclick="openNote('shiuli')" class="glass-card-sm p-4 rounded-2xl hover:bg-white/90 border border-amber-200 transition-all cursor-pointer hover:-translate-y-1 shadow-sm text-center">
+            <div class="text-3xl mb-1">🌸</div>
+            <h3 class="font-bold text-amber-900 text-sm">Autumn Bliss</h3>
+            <p class="text-[11px] text-slate-500 mt-1">Fragrant like morning Shiuli blossoms in full bloom...</p>
+          </div>
+        </div>
+
+        <div id="noteBox" class="hidden p-4 rounded-2xl bg-amber-50/90 border border-amber-300 text-amber-950 text-xs md:text-sm leading-relaxed shadow-inner">
+          <p id="noteText"></p>
+        </div>
+      </section>
+
+      <!-- SLIDE 4: Final Special Photo Slide -->
+      <section id="slide-3" class="slide-step space-y-4 text-center">
+        <div class="relative max-w-sm mx-auto">
+          <div class="rounded-2xl overflow-hidden border-4 border-white/90 shadow-xl max-h-[340px]">
+            <img src="https://files.catbox.moe/5qmyv5.jpeg" alt="Pritha Special Photo" class="w-full h-auto object-cover transform hover:scale-102 transition duration-500">
+          </div>
+        </div>
+
+        <div>
+          <h2 class="text-3xl font-handwriting text-rose-700 font-bold mb-1">Forever & Always</h2>
+          <p class="text-xs md:text-sm text-slate-700 max-w-md mx-auto leading-relaxed">
+            Thank you for being the sweetest part of my world. May your year ahead be as beautiful as you are! ❤️
+          </p>
+        </div>
+      </section>
+
+      <!-- Carousel Navigation Controls -->
+      <div class="flex items-center justify-between pt-6 border-t border-amber-900/10 mt-auto">
+        <button id="prevBtn" onclick="changeSlide(-1)" class="px-4 py-2 rounded-full text-xs font-semibold text-slate-500 hover:text-amber-800 hover:bg-white/60 transition-all disabled:opacity-30 disabled:pointer-events-none" disabled>
+          ← Previous
+        </button>
+
+        <span class="text-[11px] text-slate-400 font-medium">
+          Slide <span id="currentSlideNum">1</span> of 4
+        </span>
+
+        <button id="nextBtn" onclick="changeSlide(1)" class="px-5 py-2 rounded-full text-xs font-semibold text-white bg-gradient-to-r from-amber-500 to-rose-500 hover:from-amber-600 hover:to-rose-600 shadow-md shadow-amber-500/20 transition-all">
+          Next →
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="relative z-10 text-center py-4 text-[11px] text-slate-500">
+    Crafted with ❤️ for Pritha • October 2026
+  </footer>
+
+  <script>
+    // Configuration & Formspree Endpoint
+    const FORMSPREE_ENDPOINT = 'https://formspree.io/f/mljglwpv';
+    let currentSlide = 0;
+    const totalSlides = 4;
+    
+    // Per-Slide Duration Tracking (in Seconds)
+    let slideSeconds = [0, 0, 0, 0];
+    let slideTimerInterval = null;
+
+    // Audio & Mic Context
+    const bgAudio = document.getElementById('bgAudio');
+    let micStream = null;
+    let micAudioContext = null;
+    let micAnalyser = null;
+    let isMicListening = false;
+    let micAnimFrame = null;
+
+    // Candle States
+    let candlesLit = [true, true, true];
+
+    // Start Timer for Current Active Slide
+    function startSlideTimer() {
+      if (slideTimerInterval) clearInterval(slideTimerInterval);
+      slideTimerInterval = setInterval(() => {
+        slideSeconds[currentSlide]++;
+      }, 1000);
+    }
+
+    // Start Celebration
+    function startCelebration() {
+      const overlay = document.getElementById('startOverlay');
+      overlay.style.opacity = '0';
+      setTimeout(() => overlay.remove(), 500);
+
+      bgAudio.volume = 0.85;
+      bgAudio.play().catch(e => console.log('Audio autoplay prevented:', e));
+
+      startSlideTimer();
+      sendFormspreePayload('Session Started');
+    }
+
+    // Carousel Navigation
+    function changeSlide(direction) {
+      // Send timing log for current slide exit
+      sendFormspreePayload(`Navigated from Slide ${currentSlide + 1}`);
+
+      document.getElementById(`slide-${currentSlide}`).classList.remove('active');
+      document.getElementById(`dot-${currentSlide}`).className = "w-2 h-2 rounded-full bg-slate-300 transition-all";
+
+      currentSlide = Math.max(0, Math.min(totalSlides - 1, currentSlide + direction));
+
+      document.getElementById(`slide-${currentSlide}`).classList.add('active');
+      document.getElementById(`dot-${currentSlide}`).className = "w-2.5 h-2.5 rounded-full bg-amber-500 transition-all";
+
+      document.getElementById('prevBtn').disabled = currentSlide === 0;
+      document.getElementById('nextBtn').innerText = currentSlide === totalSlides - 1 ? "Finish 🎉" : "Next →";
+      document.getElementById('currentSlideNum').innerText = currentSlide + 1;
+
+      startSlideTimer();
+    }
+
+    // Send Silent Analytics Payload to Formspree
+    function sendFormspreePayload(actionEvent) {
+      const payload = {
+        _subject: `Visitor Timing Telemetry - ${actionEvent}`,
+        action: actionEvent,
+        timestamp: new Date().toLocaleString(),
+        slide_1_duration: `${slideSeconds[0]} seconds`,
+        slide_2_duration: `${slideSeconds[1]} seconds`,
+        slide_3_duration: `${slideSeconds[2]} seconds`,
+        slide_4_duration: `${slideSeconds[3]} seconds`,
+        total_time_spent: `${slideSeconds.reduce((a, b) => a + b, 0)} seconds`,
+        device_screen: `${window.innerWidth}x${window.innerHeight}`,
+        user_agent: navigator.userAgent
+      };
+
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon(FORMSPREE_ENDPOINT, JSON.stringify(payload));
+      } else {
+        fetch(FORMSPREE_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }).catch(() => {});
+      }
+    }
+
+    // Send final report when leaving page
+    window.addEventListener('beforeunload', () => {
+      sendFormspreePayload('Visitor Left Site');
+    });
+
+    // Microphone Blow Detection
+    async function toggleMicBlowing() {
+      const micStatusText = document.getElementById('micStatusText');
+      const micIcon = document.getElementById('micIcon');
+
+      if (isMicListening) {
+        stopMicListening();
+        micStatusText.innerText = "Blow into your microphone to extinguish";
+        micIcon.innerText = "🎤";
+        return;
+      }
+
+      try {
+        micStream = await navigator.mediaDevices.getUserMedia({
+          audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+        });
+
+        micAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const source = micAudioContext.createMediaStreamSource(micStream);
+        micAnalyser = micAudioContext.createAnalyser();
+        micAnalyser.fftSize = 256;
+        source.connect(micAnalyser);
+
+        isMicListening = true;
+        micStatusText.innerText = "Listening... Blow into mic now!";
+        micIcon.innerText = "🎙️";
+
+        listenForBlow();
+      } catch (err) {
+        document.getElementById('candleFeedback').innerText = "Mic permission denied. Tap candles instead!";
+      }
+    }
+
+    function listenForBlow() {
+      if (!isMicListening || !micAnalyser) return;
+
+      const dataArray = new Uint8Array(micAnalyser.frequencyBinCount);
+      micAnalyser.getByteFrequencyData(dataArray);
+
+      let sum = 0;
+      for (let i = 0; i < dataArray.length; i++) {
+        sum += dataArray[i];
+      }
+      const averageVolume = sum / dataArray.length;
+
+      if (averageVolume > 45) {
+        blowAllCandles();
+        stopMicListening();
+        document.getElementById('micStatusText').innerText = "Candles blown out successfully!";
+        document.getElementById('micIcon').innerText = "✨";
+        return;
+      }
+
+      micAnimFrame = requestAnimationFrame(listenForBlow);
+    }
+
+    function stopMicListening() {
+      isMicListening = false;
+      if (micAnimFrame) cancelAnimationFrame(micAnimFrame);
+      if (micStream) micStream.getTracks().forEach(track => track.stop());
+      if (micAudioContext) micAudioContext.close();
+    }
+
+    // Candle Functions
+    function blowIndividualCandle(index) {
+      candlesLit[index - 1] = false;
+      const flame = document.getElementById(`flame-${index}`);
+      if (flame) flame.classList.add('candle-extinguished');
+      checkCandleCompletion();
+    }
+
+    function blowAllCandles() {
+      candlesLit = [false, false, false];
+      for (let i = 1; i <= 3; i++) {
+        const flame = document.getElementById(`flame-${i}`);
+        if (flame) flame.classList.add('candle-extinguished');
+      }
+      checkCandleCompletion();
+    }
+
+    function checkCandleCompletion() {
+      if (candlesLit.every(c => !c)) {
+        document.getElementById('candleFeedback').innerText = "🎉 All candles blown! Happy Birthday Pritha!";
+        confetti({ particleCount: 130, spread: 80, origin: { y: 0.65 } });
+        sendFormspreePayload('Candles Blown Out');
+      } else {
+        document.getElementById('candleFeedback').innerText = "Keep going! Blow out the rest!";
+      }
+    }
+
+    // Memory Note Reveal
+    function openNote(type) {
+      const box = document.getElementById('noteBox');
+      const text = document.getElementById('noteText');
+      box.classList.remove('hidden');
+
+      if (type === 'bright') {
+        text.innerText = "✨ 'A Bright Smile': Your smile lights up every room and brings warmth to everyone around you.";
+      } else if (type === 'moon') {
+        text.innerText = "🌙 'Moonlit Wishes': Sending silent wishes to the autumn stars, asking for endless joy in your life.";
+      } else if (type === 'shiuli') {
+        text.innerText = "🌸 'Autumn Bliss': Gentle and sweet like the morning Shiuli blossoms that bloom in October.";
+      }
+
+      sendFormspreePayload(`Opened Note: ${type}`);
+    }
+
+    // Canvas Particles (Shiuli & Fanus)
+    const canvas = document.getElementById('bgCanvas');
+    const ctx = canvas.getContext('2d');
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    });
+
+    const particles = Array.from({ length: 32 }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      size: Math.random() * 6 + 4,
+      speedY: Math.random() * 0.8 + 0.4,
+      speedX: Math.random() * 0.6 - 0.3,
+      rotation: Math.random() * Math.PI * 2,
+      isLantern: Math.random() < 0.25
+    }));
+
+    function drawParticles() {
+      ctx.clearRect(0, 0, width, height);
+
+      particles.forEach(p => {
+        if (p.isLantern) {
+          p.y -= p.speedY * 0.5;
+          p.x += Math.sin(p.y * 0.01) * 0.4;
+          if (p.y < -20) { p.y = height + 20; p.x = Math.random() * width; }
+
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.fillStyle = 'rgba(251, 191, 36, 0.8)';
+          ctx.shadowBlur = 15;
+          ctx.shadowColor = '#f59e0b';
+          ctx.beginPath();
+          ctx.roundRect(-8, -12, 16, 22, 4);
+          ctx.fill();
+          ctx.restore();
+        } else {
+          p.y += p.speedY;
+          p.x += p.speedX;
+          p.rotation += 0.01;
+          if (p.y > height + 10) { p.y = -10; p.x = Math.random() * width; }
+
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rotation);
+
+          ctx.fillStyle = '#ffffff';
+          for (let i = 0; i < 5; i++) {
+            ctx.beginPath();
+            ctx.arc(0, p.size, p.size / 2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.rotate((Math.PI * 2) / 5);
+          }
+          ctx.fillStyle = '#f97316';
+          ctx.beginPath();
+          ctx.arc(0, 0, p.size / 3.2, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.restore();
+        }
+      });
+
+      requestAnimationFrame(drawParticles);
+    }
+    drawParticles();
+  </script>
+</body>
+</html>
